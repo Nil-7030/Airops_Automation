@@ -15,9 +15,6 @@ module.exports = defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure', 
 
-
-    baseURL: 'https://airops-web-microservice-qa.herokuapp.com/'
-
   },
 
   reporter: [
