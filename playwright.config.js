@@ -14,7 +14,7 @@ module.exports = defineConfig({
     headless: false,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure', 
-
+    timeout:10000
   },
 
   reporter: [
