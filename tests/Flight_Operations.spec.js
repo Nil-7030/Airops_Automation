@@ -34,17 +34,24 @@ function getCurrentWeekRange() {
 
 test.describe.configure({ mode: 'serial' });
 
+let flightOpsPage;
+
+test.beforeEach(async ({ page }) => {
+
+        const loginPage = new LoginPage(page);
+        flightOpsPage = new FlightOpsPage(page);
+
+        await page.goto(env.qa.url);
+
+        await loginPage.login(
+            testData.username[0],
+            testData.password
+        );
+
+        await page.waitForLoadState('networkidle');
+    });
+
 test('P1 - Flight Operations', async ({ page }) => {
-
-    const loginPage = new LoginPage(page);
-    const flightOpsPage = new FlightOpsPage(page);
-
-    await page.goto(env.qa.url);
-
-    await loginPage.login(
-        testData.username[0],
-        testData.password
-    );
 
     await flightOpsPage.clickFlightOpsHeading();
     await flightOpsPage.verifyWeeklyReportSelection();
@@ -52,15 +59,6 @@ test('P1 - Flight Operations', async ({ page }) => {
 
 test('P2 - Weekly Navigation', async ({ page }) => {
 
-    const loginPage = new LoginPage(page);
-    const flightOpsPage = new FlightOpsPage(page);
-
-    await page.goto(env.qa.url);
-
-    await loginPage.login(
-        testData.username[0],
-        testData.password
-    );
 
     await flightOpsPage.clickFlightOpsHeading();
 
@@ -84,16 +82,7 @@ test('P2 - Weekly Navigation', async ({ page }) => {
 
 test('P3 - FirstNameFilterValidations', async ({ page }) => {
   
-    const loginPage = new LoginPage(page);
-    const flightOpsPage = new FlightOpsPage(page);
-
-    await page.goto(env.qa.url);
-
-    await loginPage.login(
-        testData.username[0],
-        testData.password
-    );
-
+    
     await page.waitForLoadState('networkidle');
 
     await flightOpsPage.flightOperations();
