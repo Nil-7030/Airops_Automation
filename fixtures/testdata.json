@@ -4,7 +4,10 @@
     "gaurav2@geekyants.com",
     "nileshr@geekyants.com"],
 
-  "password": "secret123"
+  "password": "secret123",
+
+  "FirstName": "Nilesh"
+
 }
 
 

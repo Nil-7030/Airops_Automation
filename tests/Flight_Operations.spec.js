@@ -46,8 +46,8 @@ test('P1 - Flight Operations', async ({ page }) => {
         testData.password
     );
 
-    await flightOpsPage.ClickFlightOpsHeading();
-    await flightOpsPage.VerifyWeeklyReportSelection();
+    await flightOpsPage.clickFlightOpsHeading();
+    await flightOpsPage.verifyWeeklyReportSelection();
 });
 
 test('P2 - Weekly Navigation', async ({ page }) => {
@@ -62,9 +62,9 @@ test('P2 - Weekly Navigation', async ({ page }) => {
         testData.password
     );
 
-    await flightOpsPage.ClickFlightOpsHeading();
+    await flightOpsPage.clickFlightOpsHeading();
 
-    await flightOpsPage.WeeklydateVerify();
+    await flightOpsPage.weeklydateVerify();
 
     const currentWeek = await flightOpsPage.getWeeklyDateText();
     console.log('Weekly Date:', currentWeek);
@@ -80,4 +80,27 @@ test('P2 - Weekly Navigation', async ({ page }) => {
     await flightOpsPage.clickNextWeek();
     const nextWeek = await flightOpsPage.getWeeklyDateText();
     console.log('Next Week after clicking next button:', nextWeek);
+});
+
+test('P3 - FirstNameFilterValidations', async ({ page }) => {
+  
+    const loginPage = new LoginPage(page);
+    const flightOpsPage = new FlightOpsPage(page);
+
+    await page.goto(env.qa.url);
+
+    await loginPage.login(
+        testData.username[0],
+        testData.password
+    );
+
+    await page.waitForLoadState('networkidle');
+
+    await flightOpsPage.flightOperations();
+   
+    await page.waitForLoadState('networkidle');
+
+    await flightOpsPage.verifyColumnHeaders()
+
+    await flightOpsPage.verifySortandfilter(testData.FirstName);
 });
