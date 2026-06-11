@@ -32,24 +32,24 @@ function getCurrentWeekRange() {
     return `${start} - ${end}`;
 }
 
-test.describe.configure({ mode: 'serial' });
+test.describe.configure({ mode: 'default' });
 
 let flightOpsPage;
 
 test.beforeEach(async ({ page }) => {
 
-        const loginPage = new LoginPage(page);
-        flightOpsPage = new FlightOpsPage(page);
+    const loginPage = new LoginPage(page);
+    flightOpsPage = new FlightOpsPage(page);
 
-        await page.goto(env.qa.url);
+    await page.goto(env.qa.url);
 
-        await loginPage.login(
-            testData.username[0],
-            testData.password
-        );
+    await loginPage.login(
+        testData.username[0],
+        testData.password
+    );
 
-        await page.waitForLoadState('networkidle');
-    });
+    await page.waitForLoadState('networkidle');
+});
 
 test('P1 - Flight Operations', async ({ page }) => {
 
@@ -81,28 +81,28 @@ test('P2 - Weekly Navigation', async ({ page }) => {
 });
 
 test('P3 - FirstNameSortAtoZValidations', async ({ page }) => {
-  
-    
+
     await page.waitForLoadState('networkidle');
 
     await flightOpsPage.flightOperations();
-   
+
     await flightOpsPage.verifyColumnHeaders()
 
-    await flightOpsPage.verifySortAscending();
-   
-    const names = await flightOpsPage.getFirstNames();
+    //await flightOpsPage.verifySortAscending();
+
+    const names = await flightOpsPage.verifySortAscending();
 
     const actualNames = names.map(name => name.trim());
 
     const expectedNames = [...actualNames]
-        .sort((a, b) => a.localeCompare(b));
+        .sort();
 
     expect(actualNames).toEqual(expectedNames);
 
 });
 
-    test('P4 - FirstNameSortZtoAValidations', async ({ page }) => {
+
+test('P4 - FirstNameSortZtoAValidations', async ({ page }) => {
 
     await page.waitForLoadState('networkidle');
 
@@ -110,25 +110,31 @@ test('P3 - FirstNameSortAtoZValidations', async ({ page }) => {
 
     await flightOpsPage.verifySortDescending();
 
-   const names = await flightOpsPage.getFirstNames();
+    const names = await flightOpsPage.verifySortDescending();
 
     const actualNames = names.map(name => name.trim());
 
     const expectedNames = [...actualNames]
-        .sort((a, b) => b.localeCompare(a));
+        .sort()
+        .reverse();
+
+    expect(actualNames).toEqual(expectedNames);
 
 });
 
-  test('P5 - FirstNamefilterValidations', async ({ page }) => {
-
+test('P5 - FirstNamefilterValidations', async ({ page }) => {
     await page.waitForLoadState('networkidle');
 
     await flightOpsPage.flightOperations();
 
-    await flightOpsPage.verifyfirstNamefilter(testData.FirstName);
-    
+    const firstName = testData.FirstName;
+
+    // ✅ Actually call the filter method
+    const names = await flightOpsPage.verifyfirstNamefilter(firstName);
+
+    console.log('Displayed Name:', names[0]);
+
     for (const name of names) {
         expect(name.trim()).toContain(firstName);
     }
-  });
-
+});

@@ -13,7 +13,7 @@ class FlightOpsPage {
         this.previousWeekArrow = page.locator('.calendar-actions-wrapper svg').first();
         this.nextWeekArrow = page.locator('.calendar-actions-wrapper svg').last();
 
-        this.firstName = page.getByRole('button', { name: 'First Name' });
+        this.firstName = page.getByRole('columnheader', { name: 'First Name' });
         this.lastName = page.getByRole('button', { name: 'Last Name' });
         this.department = page.getByRole('button', { name: 'Department' });
         this.total = page.getByRole('button', { name: 'Total' });
@@ -23,9 +23,13 @@ class FlightOpsPage {
         this.reviewedBy = page.getByRole('button', { name: 'Reviewed By' });
         this.approvedBy = page.getByRole('button', { name: 'Approved By' });
 
+        this.flightOpsTable = page.getByRole('table', { name: 'custom pagination table' });
+        this.flightOpsRows = this.flightOpsTable.getByRole('rowgroup').nth(1).getByRole('row');
+
         this.sortAtoZ = page.getByRole('menuitem', { name: 'Sort A → Z' });
         this.sortZtoA = page.getByRole('menuitem', { name: 'Sort Z → A' });
         this.filterbyName = page.getByRole('textbox', { name: 'First Name' });
+        this.firstNameColumn = page.locator('tbody tr th:first-child');
 
     }
 
@@ -100,6 +104,9 @@ class FlightOpsPage {
     async verifySortAscending() {
         await this.firstName.click();
         await this.sortAtoZ.click();
+
+        const names = await this.firstName.allTextContents();
+        return names;
     }
 
     async verifySortDescending() {
@@ -107,13 +114,40 @@ class FlightOpsPage {
         await this.firstName.click();
         await this.sortZtoA.click();
 
-    }
-    async verifyfirstNamefilter(firstName) {
+        const names = await this.firstName.allTextContents();
+        return names;
 
-        await this.firstName.click();
-        await this.filterbyName.fill(firstName);
     }
+    async verifyfirstNamefilter(firstName) {  // ✅ consistent casing
+    await this.firstName.click();
 
+    await this.filterbyName.fill(firstName);  // ✅ now matches param
+
+    await this.page.getByRole('option', {
+        name: firstName,
+        exact: true
+    }).click();
+
+    await expect(this.firstNameColumn.first()).toContainText(firstName, {
+        timeout: 10000
+    });
+
+    return await this.getFirstNameColumnValues();
 }
 
-module.exports = FlightOpsPage;
+    async getFirstNameColumnValues() {
+        await expect(this.flightOpsRows.first()).toBeVisible({
+        timeout: 10000
+    });
+
+    const names = await this.firstNameColumn.allTextContents();
+
+    const trimmedNames = names.map(name => name.trim());
+
+    console.log('Displayed Names:', trimmedNames);
+
+    return trimmedNames;
+
+}
+}
+module.exports = FlightOpsPage

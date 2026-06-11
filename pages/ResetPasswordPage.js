@@ -7,7 +7,7 @@ class ResetPasswordPage {
 
         this.resetPasswordLink = page.getByRole('link', { name: 'Click here to reset your password' });
         this.enterEmailInput = page.getByRole('textbox', { name: 'Enter email' });
-        this.resetPasswordButton = page.getByRole('button', {name: 'Reset Password'});
+        this.resetPasswordButton = page.getByRole('button', { name: 'Reset Password' });
     }
 
     async clickResetPasswordLink() {
@@ -19,15 +19,15 @@ class ResetPasswordPage {
         await this.enterEmailInput.fill(username);
     }
 
-    async clickResetPasswordButton(){
+    async clickResetPasswordButton() {
         await this.resetPasswordButton.click();
     }
 
-   async resetPassword(username){
+    async resetPassword(username) {
         await this.clickResetPasswordLink();
         await this.emailInput(username);
-        await this.clickResetPasswordButton();  
-   }
+        await this.clickResetPasswordButton();
+    }
 
 }
 
