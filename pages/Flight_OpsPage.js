@@ -13,8 +13,8 @@ class FlightOpsPage {
         this.previousWeekArrow = page.locator('.calendar-actions-wrapper svg').first();
         this.nextWeekArrow = page.locator('.calendar-actions-wrapper svg').last();
 
-        this.firstName = page.getByRole( 'button', {name: 'First Name' });
-        this.lastName = page.getByRole( 'button', { name: 'Last Name' });
+        this.firstName = page.getByRole('button', { name: 'First Name' });
+        this.lastName = page.getByRole('button', { name: 'Last Name' });
         this.department = page.getByRole('button', { name: 'Department' });
         this.total = page.getByRole('button', { name: 'Total' });
         this.status = page.getByRole('button', { name: 'Status' });
@@ -82,7 +82,7 @@ class FlightOpsPage {
     }
 
     async verifyColumnHeaders() {
-        
+        await this.page.waitForLoadState('networkidle');
         await expect(this.firstName).toBeVisible({
             timeout: 10000
         });
@@ -97,19 +97,23 @@ class FlightOpsPage {
 
     }
 
-    async verifySortandfilter(firstName){
+    async verifySortAscending() {
         await this.firstName.click();
         await this.sortAtoZ.click();
+    }
+
+    async verifySortDescending() {
+
         await this.firstName.click();
         await this.sortZtoA.click();
+
+    }
+    async verifyfirstNamefilter(firstName) {
+
         await this.firstName.click();
         await this.filterbyName.fill(firstName);
     }
 
-    
-    
-
-    
 }
 
 module.exports = FlightOpsPage;

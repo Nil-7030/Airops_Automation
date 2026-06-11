@@ -80,16 +80,55 @@ test('P2 - Weekly Navigation', async ({ page }) => {
     console.log('Next Week after clicking next button:', nextWeek);
 });
 
-test('P3 - FirstNameFilterValidations', async ({ page }) => {
+test('P3 - FirstNameSortAtoZValidations', async ({ page }) => {
   
     
     await page.waitForLoadState('networkidle');
 
     await flightOpsPage.flightOperations();
    
-    await page.waitForLoadState('networkidle');
-
     await flightOpsPage.verifyColumnHeaders()
 
-    await flightOpsPage.verifySortandfilter(testData.FirstName);
+    await flightOpsPage.verifySortAscending();
+   
+    const names = await flightOpsPage.getFirstNames();
+
+    const actualNames = names.map(name => name.trim());
+
+    const expectedNames = [...actualNames]
+        .sort((a, b) => a.localeCompare(b));
+
+    expect(actualNames).toEqual(expectedNames);
+
 });
+
+    test('P4 - FirstNameSortZtoAValidations', async ({ page }) => {
+
+    await page.waitForLoadState('networkidle');
+
+    await flightOpsPage.flightOperations();
+
+    await flightOpsPage.verifySortDescending();
+
+   const names = await flightOpsPage.getFirstNames();
+
+    const actualNames = names.map(name => name.trim());
+
+    const expectedNames = [...actualNames]
+        .sort((a, b) => b.localeCompare(a));
+
+});
+
+  test('P5 - FirstNamefilterValidations', async ({ page }) => {
+
+    await page.waitForLoadState('networkidle');
+
+    await flightOpsPage.flightOperations();
+
+    await flightOpsPage.verifyfirstNamefilter(testData.FirstName);
+    
+    for (const name of names) {
+        expect(name.trim()).toContain(firstName);
+    }
+  });
+
