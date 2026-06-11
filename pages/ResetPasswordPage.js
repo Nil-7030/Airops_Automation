@@ -8,6 +8,7 @@ class ResetPasswordPage {
         this.resetPasswordLink = page.getByRole('link', { name: 'Click here to reset your password' });
         this.enterEmailInput = page.getByRole('textbox', { name: 'Enter email' });
         this.resetPasswordButton = page.getByRole('button', { name: 'Reset Password' });
+        this.loginSuccessMsg= page.locator("//div[contains(@class,'Toastify__toast-body')]")
     }
 
     async clickResetPasswordLink() {

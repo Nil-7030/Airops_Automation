@@ -1,9 +1,5 @@
-import { test, expect } from '@playwright/test';
-import testData from '../fixtures/testdata.json';
 
-const env = require('../config/env.js');
-const FlightOpsPage = require('../pages/Flight_OpsPage.js');
-const LoginPage = require('../pages/AdminLoginPage.js');
+const { test, expect } = require('../fixtures/base.fixture');
 
 function getCurrentWeekRange() {
 
@@ -34,30 +30,16 @@ function getCurrentWeekRange() {
 
 test.describe.configure({ mode: 'default' });
 
-let flightOpsPage;
-
-test.beforeEach(async ({ page }) => {
-
-    const loginPage = new LoginPage(page);
-    flightOpsPage = new FlightOpsPage(page);
-
-    await page.goto(env.qa.url);
-
-    await loginPage.login(
-        testData.username[0],
-        testData.password
-    );
-
-    await page.waitForLoadState('networkidle');
-});
-
-test('P1 - Flight Operations', async ({ page }) => {
+test('P1 - Flight Operations', async ({flightOpsPage}) => {
 
     await flightOpsPage.clickFlightOpsHeading();
     await flightOpsPage.verifyWeeklyReportSelection();
+
+      console.log("Weekly displayed")
 });
 
-test('P2 - Weekly Navigation', async ({ page }) => {
+
+test('P2 - Weekly Navigation', async ({ flightOpsPage}) => {
 
 
     await flightOpsPage.clickFlightOpsHeading();
@@ -71,6 +53,8 @@ test('P2 - Weekly Navigation', async ({ page }) => {
     console.log('Expected Week:', expectedWeek);
     expect(currentWeek).toBe(expectedWeek);
 
+    console.log("weekly Date Verfied")
+
     await flightOpsPage.clickPreviousWeek();
     const previousWeek = await flightOpsPage.getWeeklyDateText();
     console.log('Previous Week after clicking previous button:', previousWeek);
@@ -80,15 +64,13 @@ test('P2 - Weekly Navigation', async ({ page }) => {
     console.log('Next Week after clicking next button:', nextWeek);
 });
 
-test('P3 - FirstNameSortAtoZValidations', async ({ page }) => {
+test('P3 - FirstNameSortAtoZValidations', async ({ flightOpsPage }) => {
 
     await page.waitForLoadState('networkidle');
 
-    await flightOpsPage.flightOperations();
-
     await flightOpsPage.verifyColumnHeaders()
 
-    //await flightOpsPage.verifySortAscending();
+     console.log("column Header Verfied")
 
     const names = await flightOpsPage.verifySortAscending();
 
@@ -99,16 +81,14 @@ test('P3 - FirstNameSortAtoZValidations', async ({ page }) => {
 
     expect(actualNames).toEqual(expectedNames);
 
+     console.log("Sort By AtoZ Verfied")
+
 });
 
 
-test('P4 - FirstNameSortZtoAValidations', async ({ page }) => {
+test('P4 - FirstNameSortZtoAValidations', async ({ flightOpsPage }) => {
 
     await page.waitForLoadState('networkidle');
-
-    await flightOpsPage.flightOperations();
-
-    await flightOpsPage.verifySortDescending();
 
     const names = await flightOpsPage.verifySortDescending();
 
@@ -120,16 +100,15 @@ test('P4 - FirstNameSortZtoAValidations', async ({ page }) => {
 
     expect(actualNames).toEqual(expectedNames);
 
+   console.log("Sort By ZtoA Verfied")
 });
 
-test('P5 - FirstNamefilterValidations', async ({ page }) => {
+test('P5 - FirstNamefilterValidations', async ( { flightOpsPage, testData } ) => {
+    
     await page.waitForLoadState('networkidle');
 
-    await flightOpsPage.flightOperations();
-
     const firstName = testData.FirstName;
-
-    // ✅ Actually call the filter method
+ 
     const names = await flightOpsPage.verifyfirstNamefilter(firstName);
 
     console.log('Displayed Name:', names[0]);
@@ -137,4 +116,5 @@ test('P5 - FirstNamefilterValidations', async ({ page }) => {
     for (const name of names) {
         expect(name.trim()).toContain(firstName);
     }
+    console.log("Filter by Name Verfied")
 });
