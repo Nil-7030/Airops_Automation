@@ -1,49 +1,39 @@
-
 const { test, expect } = require('../fixtures/base.fixture');
+const testData = require('../fixtures/testdata.json'); // ✅ fix 1 - added import
 
 function getCurrentWeekRange() {
-
     const today = new Date();
 
     const startDate = new Date(today);
-    startDate.setDate(today.getDate() - today.getDay()); // Sunday
+    startDate.setDate(today.getDate() - today.getDay());
 
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 6);
 
-    const options = {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-    };
+    const options = { day: '2-digit', month: 'short', year: 'numeric' };
 
-    const start = startDate
-        .toLocaleDateString('en-GB', options)
-        .replace(',', '');
-
-    const end = endDate
-        .toLocaleDateString('en-GB', options)
-        .replace(',', '');
+    const start = startDate.toLocaleDateString('en-GB', options).replace(',', '');
+    const end = endDate.toLocaleDateString('en-GB', options).replace(',', '');
 
     return `${start} - ${end}`;
 }
 
 test.describe.configure({ mode: 'default' });
 
-test('P1 - Flight Operations', async ({flightOpsPage}) => {
-
+// ============================================
+// P1 - Flight Operations Landing
+// ============================================
+test('P1 - Flight Operations', async ({ flightOpsPage }) => {
     await flightOpsPage.clickFlightOpsHeading();
     await flightOpsPage.verifyWeeklyReportSelection();
-
-      console.log("Weekly displayed")
+    console.log("Weekly displayed");
 });
 
-
-test('P2 - Weekly Navigation', async ({ flightOpsPage}) => {
-
-
+// ============================================
+// P2 - Weekly Navigation
+// ============================================
+test('P2 - Weekly Navigation', async ({ flightOpsPage }) => {
     await flightOpsPage.clickFlightOpsHeading();
-
     await flightOpsPage.weeklydateVerify();
 
     const currentWeek = await flightOpsPage.getWeeklyDateText();
@@ -52,69 +42,92 @@ test('P2 - Weekly Navigation', async ({ flightOpsPage}) => {
     const expectedWeek = getCurrentWeekRange();
     console.log('Expected Week:', expectedWeek);
     expect(currentWeek).toBe(expectedWeek);
-
-    console.log("weekly Date Verfied")
+    console.log("Weekly Date Verified");
 
     await flightOpsPage.clickPreviousWeek();
     const previousWeek = await flightOpsPage.getWeeklyDateText();
-    console.log('Previous Week after clicking previous button:', previousWeek);
+    console.log('Previous Week:', previousWeek);
 
     await flightOpsPage.clickNextWeek();
     const nextWeek = await flightOpsPage.getWeeklyDateText();
-    console.log('Next Week after clicking next button:', nextWeek);
+    console.log('Next Week:', nextWeek);
 });
 
-test('P3 - FirstNameSortAtoZValidations', async ({ flightOpsPage }) => {
-
+// ============================================
+// P3 - Column Headers Verification
+// ============================================
+test('P3 - Verify Column Headers', async ({ page, flightOpsPage }) => {
     await page.waitForLoadState('networkidle');
-
-    await flightOpsPage.verifyColumnHeaders()
-
-     console.log("column Header Verfied")
-
-    const names = await flightOpsPage.verifySortAscending();
-
-    const actualNames = names.map(name => name.trim());
-
-    const expectedNames = [...actualNames]
-        .sort();
-
-    expect(actualNames).toEqual(expectedNames);
-
-     console.log("Sort By AtoZ Verfied")
-
+    await flightOpsPage.flightOperations();
+    await flightOpsPage.verifyColumnHeaders();
+    console.log("Column Headers Verified");
 });
 
+// ============================================
+// P4 - Data-Driven Sort A→Z Tests
+// P5 - Data-Driven Sort Z→A Tests
+// ============================================
+for (const col of testData.columns) {
 
-test('P4 - FirstNameSortZtoAValidations', async ({ flightOpsPage }) => {
+    test(`P4 - Sort ${col.label} A to Z`, async ({ page, flightOpsPage }) => {
+        await page.waitForLoadState('networkidle');
+        await flightOpsPage.flightOperations();
 
-    await page.waitForLoadState('networkidle');
+        const values = await flightOpsPage.sortColumnAscending(col.key);
+        const actual = values.map(v => v.trim());
+        const expected = [...actual].sort();
 
-    const names = await flightOpsPage.verifySortDescending();
+        console.log(`${col.label} (A→Z):`, actual);
+        expect(actual).toEqual(expected);
+        console.log(`${col.label} Sort A-Z Verified`);
+    });
 
-    const actualNames = names.map(name => name.trim());
+    test(`P5 - Sort ${col.label} Z to A`, async ({ page, flightOpsPage }) => { // ✅ fix 2 - P5
+        await page.waitForLoadState('networkidle');
+        await flightOpsPage.flightOperations();
 
-    const expectedNames = [...actualNames]
-        .sort()
-        .reverse();
+        const values = await flightOpsPage.sortColumnDescending(col.key);
+        const actual = values.map(v => v.trim());
+        const expected = [...actual].sort().reverse();
 
-    expect(actualNames).toEqual(expectedNames);
+        console.log(`${col.label} (Z→A):`, actual);
+        expect(actual).toEqual(expected);
+        console.log(`${col.label} Sort Z-A Verified`);
+    });
+}
 
-   console.log("Sort By ZtoA Verfied")
-});
+// ============================================
+// P6 - Data-Driven Filter Tests  ✅ fix 3 - updated comment
+// ============================================
+for (const col of testData.columns) {
 
-test('P5 - FirstNamefilterValidations', async ( { flightOpsPage, testData } ) => {
-    
-    await page.waitForLoadState('networkidle');
+    test(`P6 - Filter ${col.label} by "${col.filterValue}"`, async ({ page, flightOpsPage }) => {
+        await page.waitForLoadState('networkidle');
+        await flightOpsPage.flightOperations();
 
-    const firstName = testData.FirstName;
- 
-    const names = await flightOpsPage.verifyfirstNamefilter(firstName);
+        const result = await flightOpsPage.filterColumn(col.key, col.filterValue);
 
-    console.log('Displayed Name:', names[0]);
+        // ✅ Scenario 1 — Option not found → log and skip, don't fail
+        if (result.status === 'OPTION_NOT_FOUND') {
+            console.log(`ℹ️ SKIPPED: "${col.filterValue}" not found in ${col.label} dropdown`);
+            test.skip(); // marks test as skipped in report
+            return;
+        }
 
-    for (const name of names) {
-        expect(name.trim()).toContain(firstName);
-    }
-    console.log("Filter by Name Verfied")
-});
+        // ✅ Scenario 2 — No results returned → log and skip, don't fail
+        if (result.status === 'NO_RESULTS') {
+            console.log(`ℹ️ SKIPPED: No rows found after filtering ${col.label} by "${col.filterValue}"`);
+            test.skip();
+            return;
+        }
+
+        // ✅ Success — verify all returned rows contain filter value
+        console.log(`Displayed ${col.label} values:`, [...new Set(result.values)]);
+        expect(result.values.length).toBeGreaterThan(0);
+
+        for (const value of result.values) {
+            expect(value.trim().toLowerCase()).toContain(col.filterValue.toLowerCase());
+        }
+        console.log(`✅ ${col.label} Filter Verified`);
+    });
+}

@@ -6,7 +6,17 @@
 
   "password": "secret123",
 
-  "FirstName": "Nilesh"
+  "filterValue": "Nilesh",
+
+  "columns": [
+        { "key": "firstName", "label": "First Name", "filterValue": "Nilesh" },
+        { "key": "lastName", "label": "Last Name", "filterValue": "Behare" },
+        { "key": "department", "label": "Department", "filterValue": "Pilot" },
+        { "key": "status", "label": "Status", "filterValue": "Missing" },
+        { "key": "supervisor", "label": "supervisor", "filterValue": "Pierre - Pilot *Marcoux*" }
+
+    ]
+
 
 }
 
