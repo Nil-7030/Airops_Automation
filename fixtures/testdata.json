@@ -1,26 +1,57 @@
 {
-    
   "username": [
     "gaurav2@geekyants.com",
-    "nileshr@geekyants.com"],
-
+    "nileshr@geekyants.com"
+  ],
   "password": "secret123",
-
   "filterValue": "Nilesh",
-
   "columns": [
-        { "key": "firstName", "label": "First Name", "filterValue": "Nilesh" },
-        { "key": "lastName", "label": "Last Name", "filterValue": "Behare" },
-        { "key": "department", "label": "Department", "filterValue": "Pilot" },
-        { "key": "status", "label": "Status", "filterValue": "Missing" },
-        { "key": "supervisor", "label": "supervisor", "filterValue": "Pierre - Pilot *Marcoux*" }
-
-    ]
-
-
+    {
+      "key": "firstName",
+      "label": "First Name",
+      "filterValue": "Nilesh"
+    },
+    {
+      "key": "lastName",
+      "label": "Last Name",
+      "filterValue": "Behare"
+    },
+    {
+      "key": "department",
+      "label": "Department",
+      "filterValue": "Pilot"
+    },
+    {
+      "key": "status",
+      "label": "Status",
+      "filterValue": "Missing"
+    },
+    {
+      "key": "supervisor",
+      "label": "supervisor",
+      "filterValue": "Pierre - Pilot *Marcoux*"
+    }
+  ],
+  "booking": {
+     "name": "dummy booking",
+     "Customer": "Test Customer",
+     "Base": "Blackfalds",
+    "Aircraft": "GMHO",
+     "StartLocation" : "A",
+     "EndLocation": "B",
+     "StartDate": "10/05/2026",
+     "EndDate": "15/08/2026",
+     "StartTime": "10:00",
+      "EndTime": "14:00",
+      "MeetDate": "20/06/2026",
+      "MeetTime": "10:00",
+     "MeetLocation": "C",
+    "ReturnLocation": "D",
+    "ReturnDate":"25/06/2026",
+     "ReturnTime": "14:00",
+     "Pilot": "Nilesh Behare",
+    "ApprovingClient": "Client Test",
+     "ApprovingCompany": "R *a*"
+    }
+  
 }
-
-
-    
-    
-
