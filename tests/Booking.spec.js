@@ -1,41 +1,38 @@
-
-import { test } from '../fixtures/base.fixture';
-import testData from '../fixtures/testdata.json';
-
+const { test, expect } = require('../fixtures/base.fixture');
 const BookingPage = require('../pages/BookingPage');
+const testData = require('../fixtures/testdata.json');
 
- 
+test.describe('Booking Module', () => {
 
-test.describe.configure({ mode: 'default' });
+    test('should navigate to the Booking page', async ({ page }) => {
+        const bookingPage = new BookingPage(page);
 
-test('BookingPage Navigation', async ({ page }) => {
-    const bookingPage = new BookingPage(page);
-    await bookingPage.bookingPageNavigation();
+        await bookingPage.goto();
+        
+        
+    });
 
-})
+    test('should filter bookings by date range', async ({ page }) => {
+        const bookingPage = new BookingPage(page);
 
-test('Booking Filters', async ({ page }) => {
-    const bookingPage = new BookingPage(page);
+        await bookingPage.filterByDateRange();
 
-    await page.waitForLoadState('networkidle');
-    await bookingPage.bookingDateFilter();
+        await expect(page).not.toHaveURL(/error/);
+    });
 
-})
+    test('should display all expected grid columns', async ({ page }) => {
+        const bookingPage = new BookingPage(page);
 
-test('Booking Header Validation', async ({ page }) => {
+        await bookingPage.verifyBookingColumnsVisible();
+    });
 
-    const bookingPage = new BookingPage(page);
-    
-    await page.waitForLoadState('networkidle');
-    await bookingPage.verifybookingcolumns();
+    for (const [scenario, booking] of Object.entries(testData.bookings)) {
+        test(`should create a booking - ${scenario}`, async ({ page }) => {
+            const bookingPage = new BookingPage(page);
 
-})
+            await bookingPage.createBooking(booking);
 
-
-test('Create Booking', async ({ page }) => {
-   
-    const bookingPage = new BookingPage(page);
-    
-    await bookingPage.createBookings(testData.booking);
-    console.log("Booking Created Succesfully")
+            
+        });
+    }
 });

@@ -1,122 +1,150 @@
-import testData from '../fixtures/testdata.json';
 const { expect } = require('@playwright/test');
+
 class BookingPage {
 
-
     constructor(page) {
-
         this.page = page;
 
+        // Navigation
         this.flightOpsHeading = page.getByText('Flight Ops');
         this.booking = page.getByRole('menuitem', { name: 'Booking' });
+        this.bookingsHeader = page.locator('//a[text()="Bookings"]');
+        // Filters / grid
         this.fromCalendar = page.locator('button[aria-label="change date"]').first();
         this.toCalendar = page.locator('button[aria-label="change date"]').nth(1);
-        this.startDateColumn = page.getByRole('button', { name: "Start Date" });
-        this.endDateColumn = page.getByRole('button', { name: "End Date" });
+        this.startDateColumn = page.getByRole('button', { name: 'Start Date' });
+        this.endDateColumn = page.getByRole('button', { name: 'End Date' });
         this.numberColumn = page.getByRole('button', { name: 'Number' });
-        this.name = page.getByRole('button', { name: 'Name' });
-        this.customer = page.getByRole('button', { name: 'Customer' });
+        this.nameColumn = page.getByRole('button', { name: 'Name' });
+        this.customerColumn = page.getByRole('button', { name: 'Customer' });
 
-        this.createBooking = page.getByRole('menuitem', { name: 'Add New' });
-        this.namefield = page.locator('//input[@name="name"]');
-        this.selectcustomer = page.getByRole('textbox', { name: 'Customer' });
-        this.customerList = page.getByRole('listbox', { name: 'Customer' })
-        this.base = page.getByRole('textbox', { name: 'Base' });
-        this.baseoption = page.getByRole('option', { name: testData.booking.Base });
-        this.aircraft = page.getByRole('textbox', { name: 'Aircraft' });
-        this.aircraftoption = page.getByRole('option', { name: testData.booking.Aircraft });
-        this.startLocation = page.locator('//input[@name="startLocation"]');
-        this.meetLocation = page.locator('//input[@name="meetingLocation"]');
-        this.startDate = page.getByRole('textbox', { name: 'Start Date' });
-        this.startTime = page.getByRole('textbox', { name: 'Start Time' });
-        this.meetDate = page.getByRole('textbox', { name: 'Meet Date' });
-        this.meetTime = page.getByRole('textbox', { name: 'Meet Time' });
-        this.endDate = page.getByRole('textbox', { name: 'End Date' });
-        this.endTime = page.getByRole('textbox', { name: 'End Time' });
-        this.returnDate = page.getByRole('textbox', { name: 'Return Date' });
-        this.returnTime = page.getByRole('textbox', { name: 'Return Time' });
-        this.endLocation = page.locator('//input[@name="endLocation"]');
-        this.returnLocation = page.locator('//input[@name="returnLocation"]');
+        // Create booking form
+        this.createBookingButton = page.getByRole('menuitem', { name: 'Add New' });
+        this.nameField = page.locator('input[name="name"]');
+        this.customerField = page.getByRole('textbox', { name: 'Customer' });
+        this.customerListbox = page.getByRole('listbox', { name: 'Customer' });
+        this.baseField = page.getByRole('textbox', { name: 'Base' });
+        this.aircraftField = page.getByRole('textbox', { name: 'Aircraft' });
+        this.startLocationField = page.locator('input[name="startLocation"]');
+        this.meetLocationField = page.locator('input[name="meetingLocation"]');
+        this.startDateField = page.getByRole('textbox', { name: 'Start Date' });
+        this.startTimeField = page.getByRole('textbox', { name: 'Start Time' });
+        this.meetDateField = page.getByRole('textbox', { name: 'Meet Date' });
+        this.meetTimeField = page.getByRole('textbox', { name: 'Meet Time' });
+        this.endDateField = page.getByRole('textbox', { name: 'End Date' });
+        this.endTimeField = page.getByRole('textbox', { name: 'End Time' });
+        this.returnDateField = page.getByRole('textbox', { name: 'Return Date' });
+        this.returnTimeField = page.getByRole('textbox', { name: 'Return Time' });
+        this.endLocationField = page.locator('input[name="endLocation"]');
+        this.returnLocationField = page.locator('input[name="returnLocation"]');
 
-        this.flightReportType = page.getByRole('radio', { name: 'HYDRO QUEBEC' });
-        this.pilot = page.getByRole('textbox', { name: 'Pilot', exact: true });
-        this.selectPilot = page.getByRole('option', { name: testData.booking.Pilot });
-        this.approvingClient = page.locator('//input[@id="approvingClient"]');
-        this.selectClient = page.getByRole('option', { name: testData.booking.ApprovingClient });
-        this.approvingCompany = page.locator('//input[@id="approvingCompany"]');
-        this.selectCompany = page.getByRole('option', { name: testData.booking.ApprovingCompany });
-        this.saveBooking = page.getByTitle('Save');
+        this.flightReportTypeRadio = page.getByRole('radio', { name: 'HYDRO QUEBEC' });
+        this.pilotField = page.getByRole('textbox', { name: 'Pilot', exact: true });
+        this.approvingClientField = page.locator('#approvingClient');
+        this.approvingCompanyField = page.locator('#approvingCompany');
+        this.saveBookingButton = page.getByTitle('Save');
+
+        // Confirmation / feedback
+        this.successToast = page.getByText('Booking created successfully');
     }
 
-    async bookingPageNavigation() {
+    // ---- Dynamic option locators (value supplied per call, not bound to any fixed dataset) ----
+    optionByName(name) {
+        return this.page.getByRole('option', { name });
+    }
 
+    // ---- Navigation ----
+    async goto() {
         await this.flightOpsHeading.click();
+        await this.page.waitForLoadState('networkidle');
         await this.booking.click();
+        await expect(this.bookingsHeader).toBeVisible();
 
     }
 
-    async bookingDateFilter() {
-        await this.flightOpsHeading.click();
-        await this.booking.click();
+    // ---- Filters ----
+    async filterByDateRange() {
+        await this.goto();
+
         await this.fromCalendar.click();
-        const randomDay = Math.floor(Math.random() * 30) + 1;
-        const startdayButton = this.page.getByRole('button', {
-            name: String(randomDay),
-            exact: true
-        }).filter({ visible: true });
-        await startdayButton.click();
+        const randomDay = Math.floor(Math.random() * 28) + 1;
+
+        await this.page.getByRole('button', { name: String(randomDay), exact: true })
+            .first()
+            .click();
+
         await this.toCalendar.click();
-        const lastdayButton = this.page.getByRole('button', {
-            name: String(randomDay),
-            exact: true
-        }).filter({ visible: true });
-        await lastdayButton.click();
+        await this.page.getByRole('button', { name: String(randomDay), exact: true })
+            .first()
+            .click();
+
     }
 
-    async verifybookingcolumns(page) {
-        await this.flightOpsHeading.click();
-        await this.booking.click();
-        await page.waitForLoadState('networkidle');
+    // ---- Header validation ----
+    async verifyBookingColumnsVisible() {
+        await this.goto();
+
         await expect(this.startDateColumn).toBeVisible();
         await expect(this.endDateColumn).toBeVisible();
         await expect(this.numberColumn).toBeVisible();
-        await expect(this.name).toBeVisible();
-        await expect(this.customer).toBeVisible();
+        await expect(this.nameColumn).toBeVisible();
+        await expect(this.customerColumn).toBeVisible();
     }
 
-    async createBookings(booking) {
-        await this.flightOpsHeading.click();
-        await this.booking.click();
-        await this.createBooking.click();
-        await this.namefield.fill(booking.name);
-        await this.selectcustomer.fill(booking.Customer);
-        await this.customerList.click();
-        await this.base.click();
-        await this.baseoption.click();
-        await this.aircraft.click();
-        await this.aircraftoption.click();
-        await this.startLocation.fill(booking.StartLocation);
-        await this.endLocation.fill(booking.EndLocation);
-        await this.startDate.fill(booking.StartDate);
-        await this.endDate.fill(booking.EndDate);
-        await this.startTime.fill(booking.StartTime);
-        await this.endTime.fill(booking.EndTime);
-        await this.meetDate.fill(booking.MeetDate);
-        await this.meetLocation.fill(booking.MeetLocation);
-        await this.returnLocation.fill(booking.ReturnLocation)
-        await this.meetTime.fill(booking.MeetTime);
-        await this.returnDate.fill(booking.ReturnDate);
-        await this.returnTime.fill(booking.ReturnTime);
-        await this.flightReportType.click();
-        await this.pilot.click();
-        await this.selectPilot.scrollIntoViewIfNeeded();
-        await this.selectPilot.click();
-        await this.approvingClient.click();
-        await this.selectClient.click();
-        await this.approvingCompany.click();
-        await this.selectCompany.click();
-        await this.saveBooking.click();
+    // ---- Create booking ----
+    async openCreateBookingForm() {
+        await this.goto();
+        await this.createBookingButton.click();
     }
 
+    async fillBookingDetails(booking) {
+        await this.nameField.fill(booking.name);
+
+        await this.customerField.fill(booking.Customer);
+        await this.customerListbox.click();
+
+        await this.baseField.click();
+        await this.optionByName(booking.Base).click();
+
+        await this.aircraftField.click();
+        await this.optionByName(booking.Aircraft).click();
+
+        await this.startLocationField.fill(booking.StartLocation);
+        await this.endLocationField.fill(booking.EndLocation);
+        await this.startDateField.fill(booking.StartDate);
+        await this.endDateField.fill(booking.EndDate);
+        await this.startTimeField.fill(booking.StartTime);
+        await this.endTimeField.fill(booking.EndTime);
+        await this.meetDateField.fill(booking.MeetDate);
+        await this.meetLocationField.fill(booking.MeetLocation);
+        await this.returnLocationField.fill(booking.ReturnLocation);
+        await this.meetTimeField.fill(booking.MeetTime);
+        await this.returnDateField.fill(booking.ReturnDate);
+        await this.returnTimeField.fill(booking.ReturnTime);
+
+        await this.flightReportTypeRadio.click();
+
+        await this.pilotField.click();
+        const pilotOption = this.optionByName(booking.Pilot);
+        await pilotOption.scrollIntoViewIfNeeded();
+        await pilotOption.click();
+
+        await this.approvingClientField.click();
+        await this.optionByName(booking.ApprovingClient).click();
+
+        await this.approvingCompanyField.click();
+        await this.optionByName(booking.ApprovingCompany).click();
+    }
+
+    async submitBooking() {
+        await this.saveBookingButton.click();
+    }
+
+    async createBooking(booking) {
+        await this.openCreateBookingForm();
+        await this.fillBookingDetails(booking);
+        await this.submitBooking();
+    }
 }
+
 module.exports = BookingPage;

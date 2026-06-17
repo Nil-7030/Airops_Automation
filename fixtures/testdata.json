@@ -32,26 +32,50 @@
       "filterValue": "Pierre - Pilot *Marcoux*"
     }
   ],
-  "booking": {
-     "name": "dummy booking",
-     "Customer": "Test Customer",
-     "Base": "Blackfalds",
-    "Aircraft": "GMHO",
-     "StartLocation" : "A",
-     "EndLocation": "B",
-     "StartDate": "10/05/2026",
-     "EndDate": "15/08/2026",
-     "StartTime": "10:00",
-      "EndTime": "14:00",
-      "MeetDate": "20/06/2026",
-      "MeetTime": "10:00",
-     "MeetLocation": "C",
-    "ReturnLocation": "D",
-    "ReturnDate":"25/06/2026",
-     "ReturnTime": "14:00",
-     "Pilot": "Nilesh Behare",
-    "ApprovingClient": "Client Test",
-     "ApprovingCompany": "R *a*"
-    }
   
+  "bookings": {
+    "validBooking": {
+      "name": "Booking - Standard Charter",
+      "Customer": "Test Customer",
+      "Base": "Blackfalds",
+      "Aircraft": "GMHO",
+      "StartLocation": "Montreal",
+      "EndLocation": "Quebec City",
+      "StartDate": "2026-06-12",
+      "EndDate": "2026-08-12",
+      "StartTime": "08:00",
+      "EndTime": "10:00",
+      "MeetDate": "2026-07-12",
+      "MeetLocation": "Montreal Terminal",
+      "MeetTime": "07:30",
+      "ReturnLocation": "Montreal",
+      "ReturnDate": "2026-07-15",
+      "ReturnTime": "18:00",
+      "Pilot": "Nilesh Behare",
+      "ApprovingClient": "Client Test",
+      "ApprovingCompany": "R *a*"
+    },
+    "minimalBooking": {
+      "name": "Booking - Short Hop",
+      "Customer": "Test Customer",
+      "Base": "Hearst",
+      "Aircraft": "FAOZ",
+      "StartLocation": "Toronto",
+      "EndLocation": "Ottawa",
+      "StartDate": "2026-07-12",
+      "EndDate": "2026-08-02",
+      "StartTime": "09:00",
+      "EndTime": "10:30",
+      "MeetDate": "2026-07-10",
+      "MeetLocation": "Toronto Terminal",
+      "MeetTime": "08:30",
+      "ReturnLocation": "Toronto",
+      "ReturnDate": "2026-08-01",
+      "ReturnTime": "17:00",
+      "Pilot": "Nilesh Behare",
+      "ApprovingClient": "Client Test",
+      "ApprovingCompany": "R *a*"
+    }
+  }
 }
+  
