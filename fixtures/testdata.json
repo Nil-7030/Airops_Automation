@@ -33,49 +33,14 @@
     }
   ],
   
-  "bookings": {
-    "validBooking": {
-      "name": "Booking - Standard Charter",
-      "Customer": "Test Customer",
-      "Base": "Blackfalds",
-      "Aircraft": "GMHO",
-      "StartLocation": "Montreal",
-      "EndLocation": "Quebec City",
-      "StartDate": "2026-06-12",
-      "EndDate": "2026-08-12",
-      "StartTime": "08:00",
-      "EndTime": "10:00",
-      "MeetDate": "2026-07-12",
-      "MeetLocation": "Montreal Terminal",
-      "MeetTime": "07:30",
-      "ReturnLocation": "Montreal",
-      "ReturnDate": "2026-07-15",
-      "ReturnTime": "18:00",
-      "Pilot": "Nilesh Behare",
-      "ApprovingClient": "Client Test",
-      "ApprovingCompany": "R *a*"
-    },
-    "minimalBooking": {
-      "name": "Booking - Short Hop",
-      "Customer": "Test Customer",
-      "Base": "Hearst",
-      "Aircraft": "FAOZ",
-      "StartLocation": "Toronto",
-      "EndLocation": "Ottawa",
-      "StartDate": "2026-07-12",
-      "EndDate": "2026-08-02",
-      "StartTime": "09:00",
-      "EndTime": "10:30",
-      "MeetDate": "2026-07-10",
-      "MeetLocation": "Toronto Terminal",
-      "MeetTime": "08:30",
-      "ReturnLocation": "Toronto",
-      "ReturnDate": "2026-08-01",
-      "ReturnTime": "17:00",
-      "Pilot": "Nilesh Behare",
-      "ApprovingClient": "Client Test",
-      "ApprovingCompany": "R *a*"
+  "bookingDefaults": {
+     "Customer": "Test Customer",
+    "Base": "Blackfalds",
+    "Aircraft": "GMHO",
+    "Pilot": "Nilesh Behare",
+    "ApprovingClient": "Client Test",
+    "ApprovingCompany": "R *a*"
     }
-  }
+    
 }
   

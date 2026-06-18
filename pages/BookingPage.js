@@ -54,7 +54,7 @@ class BookingPage {
     }
 
     // ---- Navigation ----
-    async goto() {
+    async bookingNavigation() {
         await this.flightOpsHeading.click();
         await this.page.waitForLoadState('networkidle');
         await this.booking.click();
@@ -64,7 +64,7 @@ class BookingPage {
 
     // ---- Filters ----
     async filterByDateRange() {
-        await this.goto();
+        await this.bookingNavigation();
 
         await this.fromCalendar.click();
         const randomDay = Math.floor(Math.random() * 28) + 1;
@@ -82,7 +82,7 @@ class BookingPage {
 
     // ---- Header validation ----
     async verifyBookingColumnsVisible() {
-        await this.goto();
+        await this.bookingNavigation();
 
         await expect(this.startDateColumn).toBeVisible();
         await expect(this.endDateColumn).toBeVisible();
@@ -93,7 +93,7 @@ class BookingPage {
 
     // ---- Create booking ----
     async openCreateBookingForm() {
-        await this.goto();
+        await this.bookingNavigation();
         await this.createBookingButton.click();
     }
 
@@ -145,6 +145,17 @@ class BookingPage {
         await this.fillBookingDetails(booking);
         await this.submitBooking();
     }
+
+    
+
+    async verifyBookingExists(bookingName) {
+
+    const bookingRow = this.page
+        .getByRole('row')
+        .filter({ hasText: bookingName });
+
+    await expect(bookingRow).toBeVisible();
+}
 }
 
 module.exports = BookingPage;

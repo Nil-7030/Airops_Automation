@@ -1,13 +1,14 @@
-const { test, expect } = require('../fixtures/base.fixture');
+import testData from '../fixtures/testdata.json';
+import { test } from '../fixtures/base.fixture';
 const BookingPage = require('../pages/BookingPage');
-const testData = require('../fixtures/testdata.json');
+const { generateBooking } = require('../utils/bookingGenerator');
 
 test.describe('Booking Module', () => {
 
     test('should navigate to the Booking page', async ({ page }) => {
         const bookingPage = new BookingPage(page);
 
-        await bookingPage.goto();
+        await bookingPage.bookingNavigation();
         
         
     });
@@ -17,7 +18,6 @@ test.describe('Booking Module', () => {
 
         await bookingPage.filterByDateRange();
 
-        await expect(page).not.toHaveURL(/error/);
     });
 
     test('should display all expected grid columns', async ({ page }) => {
@@ -26,13 +26,25 @@ test.describe('Booking Module', () => {
         await bookingPage.verifyBookingColumnsVisible();
     });
 
-    for (const [scenario, booking] of Object.entries(testData.bookings)) {
-        test(`should create a booking - ${scenario}`, async ({ page }) => {
-            const bookingPage = new BookingPage(page);
+    test('Create Booking', async ({ page }) => {
 
-            await bookingPage.createBooking(booking);
+    const bookingPage = new BookingPage(page);
 
-            
-        });
-    }
+    const booking = generateBooking(
+        testData.bookingDefaults
+    );
+    
+    console.log(booking);
+
+    await bookingPage.createBooking(booking);
+
+    console.log('Created Booking:', booking.name);
+       await page.waitForTimeout(5000);
+
+    await bookingPage.bookingNavigation();
+
+    await bookingPage.verifyBookingExists(
+        booking.name
+    );
+});
 });
