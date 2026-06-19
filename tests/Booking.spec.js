@@ -9,8 +9,8 @@ test.describe('Booking Module', () => {
         const bookingPage = new BookingPage(page);
 
         await bookingPage.bookingNavigation();
-        
-        
+
+
     });
 
     test('should filter bookings by date range', async ({ page }) => {
@@ -28,23 +28,23 @@ test.describe('Booking Module', () => {
 
     test('Create Booking', async ({ page }) => {
 
-    const bookingPage = new BookingPage(page);
+        const bookingPage = new BookingPage(page);
 
-    const booking = generateBooking(
-        testData.bookingDefaults
-    );
-    
-    console.log(booking);
+        const booking = generateBooking(
+            testData.bookingDefaults
+        );
 
-    await bookingPage.createBooking(booking);
+        console.log(booking);
 
-    console.log('Created Booking:', booking.name);
-       await page.waitForTimeout(5000);
+        await bookingPage.createBooking(booking);
 
-    await bookingPage.bookingNavigation();
+        console.log('Created Booking:', booking.name);
+        await page.waitForTimeout(5000);
 
-    await bookingPage.verifyBookingExists(
-        booking.name
-    );
-});
+        await bookingPage.bookingNavigation();
+
+        await bookingPage.verifyBookingExists(
+            booking.name
+        );
+    });
 });

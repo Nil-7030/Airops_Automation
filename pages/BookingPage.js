@@ -1,4 +1,5 @@
 const { expect } = require('@playwright/test');
+const filterByDate = require('../utils/filterByDate');
 
 class BookingPage {
 
@@ -66,18 +67,13 @@ class BookingPage {
     async filterByDateRange() {
         await this.bookingNavigation();
 
-        await this.fromCalendar.click();
-        const randomDay = Math.floor(Math.random() * 28) + 1;
+        const selectedDay = await filterByDate.selectRandomDate(
+            this.page,
+            this.fromCalendar,
+            this.toCalendar
+        );
 
-        await this.page.getByRole('button', { name: String(randomDay), exact: true })
-            .first()
-            .click();
-
-        await this.toCalendar.click();
-        await this.page.getByRole('button', { name: String(randomDay), exact: true })
-            .first()
-            .click();
-
+        console.log(`Selected Day: ${selectedDay}`);
     }
 
     // ---- Header validation ----
@@ -146,16 +142,16 @@ class BookingPage {
         await this.submitBooking();
     }
 
-    
+
 
     async verifyBookingExists(bookingName) {
 
-    const bookingRow = this.page
-        .getByRole('row')
-        .filter({ hasText: bookingName });
+        const bookingRow = this.page
+            .getByRole('row')
+            .filter({ hasText: bookingName });
 
-    await expect(bookingRow).toBeVisible();
-}
+        await expect(bookingRow).toBeVisible();
+    }
 }
 
 module.exports = BookingPage;
