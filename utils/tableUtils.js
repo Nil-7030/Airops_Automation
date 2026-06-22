@@ -1,102 +1,106 @@
-const { expect } = require('@playwright/test');
-
 class TableUtils {
     constructor(page) {
         this.page = page;
     }
 
-    /**
-     * Generic Sort A → Z
-     * @param {Locator} columnHeader - column header locator (e.g. firstName)
-     * @param {Locator} sortAtoZOption - "Sort A → Z" option locator
-     * @param {Locator} columnValues - column cell values locator
-     */
-    async sortAscending(columnHeader, sortAtoZOption, columnValues) {
+    // Get column index dynamically from table header
+    async getColumnIndex(columnHeader) {
+        const headerText = (await columnHeader.innerText()).trim();
+
+        const headers = this.page.locator('thead th');
+        const count = await headers.count();
+
+        for (let i = 0; i < count; i++) {
+            const text = (await headers.nth(i).innerText()).trim();
+
+            if (text === headerText) {
+                return i + 1;
+            }
+        }
+
+        throw new Error(`Column header "${headerText}" not found in table.`);
+    }
+
+    // Read all values from a specific column
+    async getColumnValues(columnIndex, tableRows) {
+        const rowCount = await tableRows.count();
+        const values = [];
+
+        for (let i = 0; i < rowCount; i++) {
+            const row = tableRows.nth(i);
+
+            // Supports both td and th cells
+            const cell = row.locator(
+                `:scope > td:nth-child(${columnIndex}), :scope > th:nth-child(${columnIndex})`
+            );
+
+            if (await cell.count()) {
+                const text = (await cell.first().innerText()).trim();
+
+                if (text) {
+                    values.push(text);
+                }
+            }
+        }
+
+        return values;
+    }
+
+    // Sort Ascending
+   async sortAscending(columnHeader, sortAtoZMenuItem, tableRows) {
         await columnHeader.click();
-        await sortAtoZOption.click();
-        const values = await columnValues.allTextContents();
-        return values.map(v => v.trim());
+        await sortAtoZMenuItem.click();
+        await this.page.waitForLoadState('networkidle');
+
+        const colIndex = await this.getColumnIndex(columnHeader);
+        return this.getColumnValues(colIndex, tableRows);
     }
 
-    /**
-     * Generic Sort Z → A
-     */
-    async sortDescending(columnHeader, sortZtoAOption, columnValues) {
+    // ── Sort Descending ────────────────────────────────────────────────────
+    async sortDescending(columnHeader, sortZtoAMenuItem, tableRows) {
         await columnHeader.click();
-        await sortZtoAOption.click();
-        const values = await columnValues.allTextContents();
-        return values.map(v => v.trim());
+        await sortZtoAMenuItem.click();
+        await this.page.waitForLoadState('networkidle');
+
+        const colIndex = await this.getColumnIndex(columnHeader);
+        return this.getColumnValues(colIndex, tableRows);
     }
 
-    /**
-     * Generic Column Filter
-     * @param {Locator} columnHeader - column header locator
-     * @param {Locator} filterInput - filter input box
-     * @param {Locator} columnValues - column cell values locator
-     * @param {Locator} rows - table rows locator (for visibility check)
-     * @param {string} filterValue - value to filter by
-     */
-    async filterByColumn(columnHeader, filterInput, columnValues, rows, filterValue) {
-    await columnHeader.click();
-    await filterInput.fill(filterValue);
 
-    // Wait for dropdown option to appear after typing
-    const option = this.page.getByRole('option', {
-        name: filterValue,
-        exact: true
-    });
+    // Filter Column
+    async filterByColumn(columnHeader, filterInput, tableRows, filterValue) {
+        await filterInput.click();
+        await filterInput.fill(filterValue);
 
-    // ✅ Wait for option — if not found, log and SKIP (don't fail)
-    const optionExists = await option.waitFor({
-        state: 'visible',
-        timeout: 5000
-    }).then(() => true).catch(() => false);
+        const option = this.page.getByRole('option', {
+            name: new RegExp(filterValue, 'i'),
+        });
 
-    if (!optionExists) {
-        console.log(`ℹ️ Filter option "${filterValue}" not found in dropdown — skipping test`);
-        await this.page.keyboard.press('Escape'); // close dropdown cleanly
+        try {
+            await option.waitFor({
+                state: 'visible',
+                timeout: 5000,
+            });
+        } catch {
+            await this.page.keyboard.press('Escape');
+
+            return {
+                status: 'OPTION_NOT_FOUND',
+                values: [],
+            };
+        }
+
+        await option.click();
+
+        await this.page.waitForTimeout(1000);
+
+        const columnIndex = await this.getColumnIndex(columnHeader);
+        const values = await this.getColumnValues(columnIndex, tableRows);
+
         return {
-            status: 'OPTION_NOT_FOUND',
-            message: `Filter option "${filterValue}" not found in dropdown`,
-            values: []
+            status: values.length > 0 ? 'OK' : 'NO_RESULTS',
+            values,
         };
-    }
-
-    await option.click();
-
-    // Check if table has results
-    const hasResults = await rows.first().isVisible({ 
-        timeout: 5000 
-    }).catch(() => false);
-
-    if (!hasResults) {
-        console.log(`ℹ️ No results found for filter "${filterValue}" — skipping test`);
-        return {
-            status: 'NO_RESULTS',
-            message: `No results found for filter "${filterValue}"`,
-            values: []
-        };
-    }
-
-    await expect(columnValues.first()).toContainText(filterValue, { timeout: 10000, ignoreCase: true })
-    const values = await columnValues.allTextContents();
-    const trimmedValues = values.map(v => v.trim());
-
-    console.log('Displayed Values:', [...new Set(trimmedValues)]);
-    return {
-        status: 'SUCCESS',
-        message: `Filter "${filterValue}" applied successfully`,
-        values: trimmedValues
-    };
-}
-
-    /**
-     * Generic column values fetcher (with visibility wait)
-     */
-    async getColumnValues(columnValues, rows) {
-        await expect(rows.first()).toBeVisible({ timeout: 10000 });
-        const values = await columnValues.allTextContents();
-        return values.map(v => v.trim());
     }
 }
 

@@ -19,7 +19,7 @@ class FlightOpsPage {
         this.sortAtoZ = page.getByRole('menuitem', { name: 'Sort A → Z' });
         this.sortZtoA = page.getByRole('menuitem', { name: 'Sort Z → A' });
 
-        // ✅ DYNAMIC COLUMN CONFIG — add any column here
+        
         this.columns = {
             firstName: {
                 header: page.getByRole('columnheader', { name: 'First Name' }),
@@ -114,9 +114,6 @@ class FlightOpsPage {
         await expect(this.approvedBy).toBeVisible();
     }
 
-    // ============================================
-    // ✅ GENERIC METHODS — work for ANY column
-    // ============================================
 
     /**
      * Sort any column A → Z

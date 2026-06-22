@@ -9,7 +9,6 @@ test.describe('Booking Module', () => {
 
         await FlightReport.FlightReportNavigation();
 
-
     });
 
     test('flightreport calender Validation', async ({ page }) => {

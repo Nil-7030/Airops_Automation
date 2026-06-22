@@ -2,45 +2,42 @@ const { test: base } = require('@playwright/test');
 const AdminLoginPage = require('../pages/AdminLoginPage');
 const FlightOpsPage = require('../pages/FlightOpsPage');
 const ResetPasswordPage = require('../pages/ResetPasswordPage');
+const FlightReport = require('../pages/FlightReportFilterPage');   
 const testData = require('./testdata.json');
 const env = require('../config/env');
 
 const test = base.extend({
 
-    
     adminLoginPage: async ({ page }, use) => {
-        const adminLoginPage = new AdminLoginPage(page);
-        await use(adminLoginPage);
+        await use(new AdminLoginPage(page));
     },
 
-    
     flightOpsPage: async ({ page }, use) => {
-        const flightOpsPage = new FlightOpsPage(page);
-        await use(flightOpsPage);
+        await use(new FlightOpsPage(page));
     },
 
-    
     resetPasswordPage: async ({ page }, use) => {
-        const resetPasswordPage = new ResetPasswordPage(page);
-        await use(resetPasswordPage);
+        await use(new ResetPasswordPage(page));
     },
 
-    
-    testData: async ({ }, use) => {
+    flightReport: async ({ page }, use) => {       // ← add this fixture
+        await use(new FlightReport(page));
+    },
+
+    testData: async ({}, use) => {
         await use(testData);
     },
 
-    
     autoLogin: [async ({ page, adminLoginPage }, use) => {
         await page.goto(env.qa.url);
         await adminLoginPage.login(
             testData.username[0],
             testData.password
         );
-
         await page.waitForLoadState('networkidle');
         await use();
     }, { auto: true }]
+
 });
 
 module.exports = { test, expect: base.expect };

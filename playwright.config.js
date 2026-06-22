@@ -6,7 +6,7 @@ import { defineConfig, devices } from '@playwright/test';
 module.exports = defineConfig({
   testDir: './tests',
 
-  timeout: 500000,
+  timeout: 300000,
   
 
   use: {

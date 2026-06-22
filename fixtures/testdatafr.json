@@ -1,0 +1,34 @@
+{
+  "columns": [
+    {
+      "key": "pilot",
+      "label": "Pilot",
+      "filterValue": "Nilesh"
+    },
+    {
+      "key": "aircraft",
+      "label": "Aircraft",
+      "filterValue": "GMHO"
+    },
+    {
+      "key": "customer",
+      "label": "Customer",
+      "filterValue": "Test Customer"
+    },
+    {
+      "key": "ame",
+      "label": "AME",
+      "filterValue": "Adam House"
+    },
+    {
+      "key": "approvedBy",
+      "label": "Approved By",
+      "filterValue": "All"
+    },
+    {
+      "key": "invoiceNumber",
+      "label": "Invoice Number",
+      "filterValue": "6788"
+    }
+  ]
+}
