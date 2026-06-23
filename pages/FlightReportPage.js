@@ -30,6 +30,8 @@ class FlightReport {
         this.comments = page.getByRole('button', { name: 'Comments' });
         this.MobileStatus = page.getByRole('button', { name: 'mobile status' });
 
+        
+
     }
 
     async FlightReportNavigation() {

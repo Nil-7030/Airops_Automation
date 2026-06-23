@@ -47,7 +47,7 @@ class TableUtils {
     }
 
     // Sort Ascending
-   async sortAscending(columnHeader, sortAtoZMenuItem, tableRows) {
+    async sortAscending(columnHeader, sortAtoZMenuItem, tableRows) {
         await columnHeader.click();
         await sortAtoZMenuItem.click();
         await this.page.waitForLoadState('networkidle');
@@ -73,7 +73,8 @@ class TableUtils {
         await filterInput.fill(filterValue);
 
         const option = this.page.getByRole('option', {
-            name: new RegExp(filterValue, 'i'),
+            name: filterValue,
+            exact: true
         });
 
         try {

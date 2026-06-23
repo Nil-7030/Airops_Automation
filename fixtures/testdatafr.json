@@ -1,5 +1,11 @@
 {
+
   "columns": [
+     {
+      "key": "approvalStatus",
+      "label": "Status",
+      "filterValue": "Approved"
+    },
     {
       "key": "pilot",
       "label": "Pilot",
@@ -30,5 +36,6 @@
       "label": "Invoice Number",
       "filterValue": "6788"
     }
+   
   ]
 }

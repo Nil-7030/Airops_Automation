@@ -21,6 +21,11 @@ class FlightReportFilterPage {
 
         // Column configuration
         this.columns = {
+            approvalStatus: {
+                header: page.getByRole('button', { name: 'Approval status', exact: true }),
+                filterInput: page.getByRole('textbox', { name: 'Status' }),
+            },
+
             pilot: {
                 header: page.getByRole('button', { name: 'Pilot', exact: true }),
                 filterInput: page.getByRole('textbox', { name: 'Pilot' }),
@@ -38,7 +43,7 @@ class FlightReportFilterPage {
                 filterInput: page.getByRole('textbox', { name: 'AME' }),
             },
             approvedBy: {
-                header: page.getByRole('button', { name: 'Approved By', exact: true }),
+                header: page.getByRole('button', { name: 'Approved by', exact: true }),
                 filterInput: page.getByRole('textbox', { name: 'Approved By' }),
             },
             invoiceNumber: {
@@ -93,7 +98,7 @@ class FlightReportFilterPage {
         );
     }
 
-   // ── Sort ───────────────────────────────────────────────────────────────
+    // ── Sort ───────────────────────────────────────────────────────────────
     async sortColumnAscending(columnKey) {
         const column = this.#getColumn(columnKey);
         return this.tableUtils.sortAscending(
