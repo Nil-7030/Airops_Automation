@@ -18,7 +18,7 @@ class FlightReport {
         this.flightType = page.getByRole('button', { name: 'Flight Type' });
         this.flightReportColumn = page.getByRole('button', { name: 'Flight Report' });
         this.acType = page.getByRole('button', { name: 'AC Type' });
-        this.pilot = page.getByRole('button', { name: 'Pilot', exact:'true'}).first();
+        this.pilot = page.getByRole('button', { name: 'Pilot', exact: 'true' }).first();
         this.coPilot = page.getByRole('button', { name: 'Co Pilot' });
         this.ame = page.getByRole('button', { name: 'AME' });
         this.apprentice = page.getByRole('button', { name: 'Apprentice' });
@@ -29,8 +29,12 @@ class FlightReport {
         this.approvedBy = page.getByRole('button', { name: 'Approved By' });
         this.comments = page.getByRole('button', { name: 'Comments' });
         this.MobileStatus = page.getByRole('button', { name: 'mobile status' });
+        this.tableRows = page.locator('tbody tr');
+        this.reportNumberLabel = page.locator('text=Flight Reports');
+        this.approvedStatusChip = page.locator('text=Approved Status').locator('xpath=following-sibling::*[1]');
+        this.mobileStatusChip = page.locator('text=Mobile Status').locator('xpath=following-sibling::*[1]');
 
-        
+
 
     }
 
@@ -81,6 +85,60 @@ class FlightReport {
 
     }
 
+    async getFlightReportSummary(rowIndex = 0) {
+
+        const row = this.tableRows.nth(rowIndex);
+
+        return {
+            approvalStatus: (
+                await row.locator('th[role="cell"]').nth(0)
+                    .locator('.MuiChip-label')
+                    .textContent()
+            ).trim(),
+
+            reportNumber: (
+                await row.locator('th[role="cell"]').nth(6)
+                    .textContent()
+            ).trim(),
+
+            mobileStatus: (
+                await row.locator('th[role="cell"]').nth(18)
+                    .locator('.MuiChip-label')
+                    .textContent()
+            ).trim()
+        };
+    }
+
+    async openFlightReport(rowIndex = 0) {
+        await this.tableRows.nth(rowIndex).click();
+    }
+
+
+     async getOpenedReportDetails() {
+
+    const reportNumber = (
+        await this.page
+            .locator('text=Flight Reports')
+            .locator('xpath=following::*[normalize-space() and string-length(normalize-space())=6][1]')
+            .textContent()
+    ).trim();
+
+    const pageText = await this.page.locator('body').innerText();
+
+    const approvalMatch = pageText.match(
+        /Approved Status\s*:?\s*(NOT APPROVED|APPROVED)/i
+    );
+
+    const mobileMatch = pageText.match(
+        /Mobile Status\s*:?\s*(NO SIGNATURE|SIGNED)/i
+    );
+
+    return {
+        reportNumber,
+        approvalStatus: approvalMatch ? approvalMatch[1].trim() : '',
+        mobileStatus: mobileMatch ? mobileMatch[1].trim() : ''
+    };
+}
 }
 module.exports = FlightReport;
 
