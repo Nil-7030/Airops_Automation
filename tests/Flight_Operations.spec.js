@@ -82,7 +82,7 @@ for (const col of testData.columns) {
         console.log(`${col.label} Sort A-Z Verified`);
     });
 
-    test(`P5 - Sort ${col.label} Z to A`, async ({ page, flightOpsPage }) => { // ✅ fix 2 - P5
+    test(`P5 - Sort ${col.label} Z to A`, async ({ page, flightOpsPage }) => { 
         await page.waitForLoadState('networkidle');
         await flightOpsPage.flightOperations();
 
@@ -97,7 +97,7 @@ for (const col of testData.columns) {
 }
 
 // ============================================
-// P6 - Data-Driven Filter Tests  ✅ fix 3 - updated comment
+// P6 - Data-Driven Filter Tests  
 // ============================================
 for (const col of testData.columns) {
 

@@ -34,6 +34,13 @@ class FlightReport {
         this.approvedStatusChip = page.locator('text=Approved Status').locator('xpath=following-sibling::*[1]');
         this.mobileStatusChip = page.locator('text=Mobile Status').locator('xpath=following-sibling::*[1]');
 
+        this.emailButton = page.getByRole('menuitem', { name: 'Send Flight Report to Email' });
+        this.lockButton = page.locator('button.MuiSpeedDialAction-fab').nth(1);
+
+        this.reviewApproveButton = page.locator('button.MuiSpeedDialAction-fab').nth(2);
+        this.flightReportBreadcrumb = page.getByText('Flight Reports').first();
+        // Toast message
+        this.toastMessage = page.locator('.Toastify__toast').last();
 
 
     }
@@ -85,60 +92,170 @@ class FlightReport {
 
     }
 
-    async getFlightReportSummary(rowIndex = 0) {
+    async getFlightReportSummaryByNumber(reportNumber) {
 
-        const row = this.tableRows.nth(rowIndex);
+        const rowCount = await this.tableRows.count();
+
+        for (let i = 0; i < rowCount; i++) {
+
+            const row = this.tableRows.nth(i);
+
+            const currentReportNumber = (
+                await row.locator('th[role="cell"]').nth(6).textContent()
+            ).trim();
+
+            if (currentReportNumber === reportNumber) {
+
+                return {
+                    approvalStatus: (
+                        await row.locator('th[role="cell"]').nth(0)
+                            .locator('.MuiChip-label')
+                            .textContent()
+                    ).trim(),
+
+                    reportNumber: currentReportNumber,
+
+                    mobileStatus: (
+                        await row.locator('th[role="cell"]').nth(18)
+                            .locator('.MuiChip-label')
+                            .textContent()
+                    ).trim()
+                };
+            }
+        }
+
+        throw new Error(`Flight Report ${reportNumber} not found.`);
+    }
+
+    async openFlightReportByNumber(reportNumber) {
+
+        await this.page.waitForLoadState('networkidle');
+
+        await this.tableRows.first().waitFor({
+            state: 'visible',
+            timeout: 15000
+        });
+
+        const rowCount = await this.tableRows.count();
+
+        for (let i = 0; i < rowCount; i++) {
+
+            const row = this.tableRows.nth(i);
+
+            const reportNo = (
+                await row.locator('[role="cell"]').nth(6).textContent()
+            ).trim();
+
+            console.log(reportNo);
+
+            if (reportNo === reportNumber) {
+                await row.click();
+                return;
+            }
+        }
+
+        throw new Error(`Flight Report ${reportNumber} not found.`);
+    }
+
+
+
+    async getOpenedReportDetails() {
+
+        const reportNumber = (
+            await this.page
+                .locator('text=Flight Reports')
+                .locator('xpath=following::*[normalize-space() and string-length(normalize-space())=6][1]')
+                .textContent()
+        ).trim();
+
+        const pageText = await this.page.locator('body').innerText();
+
+        const approvalMatch = pageText.match(
+            /Approved Status\s*:?\s*(NOT APPROVED|APPROVED)/i
+        );
+
+        const mobileMatch = pageText.match(
+            /Mobile Status\s*:?\s*(NO SIGNATURE|SIGNED)/i
+        );
 
         return {
-            approvalStatus: (
-                await row.locator('th[role="cell"]').nth(0)
-                    .locator('.MuiChip-label')
-                    .textContent()
-            ).trim(),
-
-            reportNumber: (
-                await row.locator('th[role="cell"]').nth(6)
-                    .textContent()
-            ).trim(),
-
-            mobileStatus: (
-                await row.locator('th[role="cell"]').nth(18)
-                    .locator('.MuiChip-label')
-                    .textContent()
-            ).trim()
+            reportNumber,
+            approvalStatus: approvalMatch ? approvalMatch[1].trim() : '',
+            mobileStatus: mobileMatch ? mobileMatch[1].trim() : ''
         };
     }
 
-    async openFlightReport(rowIndex = 0) {
-        await this.tableRows.nth(rowIndex).click();
+    async getMobileStatus() {
+
+        const pageText = await this.page.locator('body').innerText();
+
+        const match = pageText.match(
+            /Mobile Status\s*:?\s*(NOT LOCKED|LOCKED|NO SIGNATURE|SIGNED)/i
+        );
+
+        if (!match) {
+            throw new Error('Unable to fetch Mobile Status');
+        }
+
+        return match[1].trim();
     }
 
+    async backToFlightReportList() {
+        await this.flightReportBreadcrumb.click();
+        await this.page.waitForLoadState('networkidle');
+    }
 
-     async getOpenedReportDetails() {
+    async getApprovalStatus() {
 
-    const reportNumber = (
-        await this.page
-            .locator('text=Flight Reports')
-            .locator('xpath=following::*[normalize-space() and string-length(normalize-space())=6][1]')
-            .textContent()
-    ).trim();
+        const pageText = await this.page.locator('body').innerText();
 
-    const pageText = await this.page.locator('body').innerText();
+        const match = pageText.match(
+            /Approved Status\s*:\s*([^\n\r]+)/i
+        );
 
-    const approvalMatch = pageText.match(
-        /Approved Status\s*:?\s*(NOT APPROVED|APPROVED)/i
-    );
+        if (!match) {
+            throw new Error('Approval Status not found');
+        }
 
-    const mobileMatch = pageText.match(
-        /Mobile Status\s*:?\s*(NO SIGNATURE|SIGNED)/i
-    );
+        return match[1].trim();
+    }
 
-    return {
-        reportNumber,
-        approvalStatus: approvalMatch ? approvalMatch[1].trim() : '',
-        mobileStatus: mobileMatch ? mobileMatch[1].trim() : ''
-    };
-}
+    async sendReportToEmail() {
+
+        await this.emailButton.waitFor({
+            state: 'visible'
+        });
+
+        await this.emailButton.click();
+    }
+
+    async toggleLockStatus() {
+
+        await this.lockButton.waitFor({
+            state: 'visible'
+        });
+
+        await this.lockButton.click();
+    }
+    async reviewOrApproveReport() {
+
+        await this.reviewApproveButton.waitFor({
+            state: 'visible'
+        });
+
+        await this.reviewApproveButton.click();
+    }
+
+    async getToastMessage() {
+
+        await this.toastMessage.waitFor({
+            state: 'visible',
+            timeout: 10000
+        });
+
+        return await this.toastMessage.textContent();
+    }
+
 }
 module.exports = FlightReport;
 
